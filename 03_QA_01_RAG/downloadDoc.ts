@@ -30,7 +30,7 @@ const files = [
   'https://www.irs.gov/pub/irs-pdf/p1212.pdf',
 ];
 
-const downloadDirectory = 'data';
+const downloadDirectory = 'data';//../data
 
 createDirectory(downloadDirectory);
 

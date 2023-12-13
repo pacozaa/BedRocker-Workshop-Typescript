@@ -2,17 +2,18 @@ import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Document } from "langchain/document";
-import { embedQuery } from "./embedQuery.js";
+import { embedQuery } from "./embedQuery01Common";
 import { FaissStore } from "langchain/vectorstores/faiss";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { BedrockEmbeddings } from "langchain/embeddings/bedrock";
-
+import { RetrievalQAChain, loadQAStuffChain } from "langchain/chains";
+import { Bedrock } from "langchain/llms/bedrock";
+import { prompt } from "./promptTemplate"
 
 const bedRockConfig = {
   region: "us-east-1",
   credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
   model: "amazon.titan-embed-text-v1",
 }
@@ -30,7 +31,7 @@ const docs = await directoryLoader.load();
 
 /* Additional steps : Split text into chunks with any TextSplitter. You can then use it as context or save it to memory afterwards. */
 const textSplitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 1000,
+  chunkSize: 5000,
   chunkOverlap: 100,
 });
 //docs in example
@@ -55,5 +56,24 @@ console.log("Size of the embedding: ", sampleEmbedding.length);
 
 const vectorStore = await FaissStore.fromDocuments(splitDocs, new BedrockEmbeddings(bedRockConfig));
 
-const resultAll = await vectorStore.similaritySearch("Is it possible that I get sentenced to jail due to failure in filings?")
-console.log({resultAll});
+const query = "Is it possible that I get sentenced to jail due to failure in filings?"
+const resultAll = await vectorStore.similaritySearch(query,4)
+console.log({ resultAll });
+
+const model = new Bedrock({
+  model: "meta.llama2-13b-chat-v1", // You can also do e.g. "anthropic.claude-v2"
+  region: "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+const chain = new RetrievalQAChain({
+  combineDocumentsChain: loadQAStuffChain(model,{prompt}),
+  retriever: vectorStore.asRetriever(1),
+  returnSourceDocuments: true
+})
+
+const res = await chain.call({query});
+console.log({ res });
