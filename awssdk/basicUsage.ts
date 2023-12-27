@@ -5,9 +5,8 @@ import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedroc
 const client = new BedrockRuntimeClient({ region: "us-east-1" });
 
 const params = {
-    // modelId: "meta.llama2-13b-chat-v1",
-    modelId: "amazon.titan-embed-text-v1",
-    body: "{\"prompt\":\"Hi what time is it in BKK\",\"max_gen_len\":512,\"temperature\":0.5,\"top_p\":0.9}",
+    modelId: "meta.llama2-13b-chat-v1",
+    body: "{\"prompt\":\"Give me three baby names\",\"max_gen_len\":512,\"temperature\":0.5,\"top_p\":0.9}",
     contentType: 'application/json',
     accept: '*/*',
   };

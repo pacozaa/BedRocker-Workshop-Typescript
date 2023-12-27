@@ -2,12 +2,12 @@ import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Document } from "langchain/document";
-import { embedQuery } from "./embedQuery01Common";
+import { embedQuery } from "./embedQuery.js";
 import { FaissStore } from "langchain/vectorstores/faiss";
 import { BedrockEmbeddings } from "langchain/embeddings/bedrock";
 import { RetrievalQAChain, loadQAStuffChain } from "langchain/chains";
-import { Bedrock } from "langchain/llms/bedrock";
-import { prompt } from "./promptTemplate"
+import { prompt } from "./promptTemplate.js"
+import { model } from "./model.js";
 
 const bedRockConfig = {
   region: "us-east-1",
@@ -59,15 +59,6 @@ const vectorStore = await FaissStore.fromDocuments(splitDocs, new BedrockEmbeddi
 const query = "Is it possible that I get sentenced to jail due to failure in filings?"
 const resultAll = await vectorStore.similaritySearch(query,4)
 console.log({ resultAll });
-
-const model = new Bedrock({
-  model: "meta.llama2-13b-chat-v1", // You can also do e.g. "anthropic.claude-v2"
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
 
 const chain = new RetrievalQAChain({
   combineDocumentsChain: loadQAStuffChain(model,{prompt}),
