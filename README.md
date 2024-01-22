@@ -6,6 +6,8 @@ Convert from python to typescript from https://github.com/aws-samples/amazon-bed
 
 Checkout folder `rag`
 
-## AWS Bedrock SDK
+## AWS Bedrock with AWS SDK
 
 Checkout folder `awssdk`
+- `basicUsage` is an example how to run base model with AWS SDK
+- `knowledgebase` is an example how to run knowledge base and base model together with AWS SDK

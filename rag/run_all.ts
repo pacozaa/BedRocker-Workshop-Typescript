@@ -55,9 +55,17 @@ console.log("Sample embedding of a document chunk: ", sampleEmbedding);
 console.log("Size of the embedding: ", sampleEmbedding.length);
 
 const vectorStore = await FaissStore.fromDocuments(splitDocs, new BedrockEmbeddings(bedRockConfig));
-
-const query = "Is it possible that I get sentenced to jail due to failure in filings?"
-const resultAll = await vectorStore.similaritySearch(query,4)
+//"What are Palo IT Thailand's rules and regulations?"
+//"What are Palo IT Thailand working hours?"
+//"How many holiday of Palo IT Thailand in 2024?"
+//"Summarize Strategy Roadmap 2024 please?"
+//"I am new, how can I reimburse the expense?"
+//What are Palo IT onboarding process?
+// What are Palo IT tech stack and technical standard?
+//What are feedback giving methodology in Palo IT?
+//What are the list of customers of Palo IT Thailand
+const query = "How many holiday of Palo IT Thailand in 2024?"
+const resultAll = await vectorStore.similaritySearch(query,14)
 console.log({ resultAll });
 
 const chain = new RetrievalQAChain({
