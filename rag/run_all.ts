@@ -1,13 +1,14 @@
 import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { JSONLoader } from "langchain/document_loaders/fs/json";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Document } from "langchain/document";
 import { embedQuery } from "./embedQuery.js";
 import { FaissStore } from "langchain/vectorstores/faiss";
 import { BedrockEmbeddings } from "langchain/embeddings/bedrock";
 import { RetrievalQAChain, loadQAStuffChain } from "langchain/chains";
-import { prompt } from "./promptTemplate.js"
-import { model } from "./model.js";
+import { prompt } from "./promptTemplate.js";
+import { bedrock } from "../llm/bedrock.js";
 
 const bedRockConfig = {
   region: "us-east-1",
@@ -22,6 +23,7 @@ const directoryLoader = new DirectoryLoader(
   "./data",
   {
     ".pdf": (path: string) => new PDFLoader(path),
+    ".json": (path: string) => new JSONLoader(path)
   }
 );
 // documents in example
@@ -64,13 +66,17 @@ const vectorStore = await FaissStore.fromDocuments(splitDocs, new BedrockEmbeddi
 // What are Palo IT tech stack and technical standard?
 //What are feedback giving methodology in Palo IT?
 //What are the list of customers of Palo IT Thailand
-const query = "How many holiday of Palo IT Thailand in 2024?"
-const resultAll = await vectorStore.similaritySearch(query,14)
+// Today is 26 Jan 2024, When is Palo next holiday?
+const query = "Today is 26 Jan 2024, When is Palo next holiday?"// Hey I want to book golf course 26 FEb...
+// For example .... 15 slot abcd, i want you to answer with the closest slot...
+// i want this slot
+// give me this infomation
+const resultAll = await vectorStore.similaritySearch(query,3)
 console.log({ resultAll });
 
 const chain = new RetrievalQAChain({
-  combineDocumentsChain: loadQAStuffChain(model,{prompt}),
-  retriever: vectorStore.asRetriever(1),
+  combineDocumentsChain: loadQAStuffChain(bedrock,{prompt}),
+  retriever: vectorStore.asRetriever(2),
   returnSourceDocuments: true
 })
 
