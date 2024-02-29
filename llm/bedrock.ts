@@ -2,7 +2,7 @@ import { Bedrock } from "langchain/llms/bedrock";
 import { BedrockModelName } from "../constant/modelName.js";
 
 export const bedrock = new Bedrock({
-  model: BedrockModelName.LLAMA213B_V1, // You can also do e.g. "anthropic.claude-v2"
+  model: BedrockModelName.LLAMA2_70B_CHAT_V1, // You can also do e.g. "anthropic.claude-v2"
   region: "us-east-1",
   maxTokens: 2048,
   credentials: {

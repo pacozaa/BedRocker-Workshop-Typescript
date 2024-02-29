@@ -16,8 +16,13 @@ const directoryLoader = new DirectoryLoader(
         ".txt": (path: string) => new TextLoader(path)
     }
 );
+
+// const loader = new TextLoader("./data/sample.txt");
+
+// const docs = await loader.load();
 // documents in example
 const docs = await directoryLoader.load();
+console.log({ docslen: docs.length })
 
 const textSplitter = new RecursiveCharacterTextSplitter({
     chunkSize: 4000,
@@ -39,16 +44,29 @@ console.log(`Average length among ${docs.length} documents (after split) is ${av
 
 console.log({ pageContent0: await model.getNumTokens(splitDocs[0].pageContent) })
 console.log({ metadata0: splitDocs[0].metadata })
+
 const promptTemplate = PromptTemplate.fromTemplate(`
-  Write a list of topics in this meeting transcription:
+[Instruction] Write a list of topics in this meeting transcription in Markdown bullet points format[/Instruction]
 
-
+<transcription>
 "{text}"
+</transcription>
 
+List of Topics in Markdown bullet points format:`);
 
-List of Topics in bullet points format:`
-);
-const chain = loadSummarizationChain(model, { type: "map_reduce", combineMapPrompt: promptTemplate })
+/**
+ * 
+ * combineMapPrompt is the prompt that we summarized each chunk piece
+ * combinePrompt is the prompt that we combine summarized piece together
+ * More Info 
+ * https://github.com/langchain-ai/langchainjs/blob/11a617d7bc5fe6216f71625213d35354dbf9df75/langchain/src/chains/summarization/load.ts
+ * Hence if you want to use Claude 2.1, 
+ * you have to modify both combinePrompt, combineMapPrompt because it has its own prompt format aka \n\nHuman:{prompt}\n\nAssistant:
+ * 
+ * 
+*/
+
+const chain = loadSummarizationChain(model, { type: "map_reduce", combinePrompt: promptTemplate, verbose: true, returnIntermediateSteps: true, })
 
 const res = await chain.call({
     input_documents: splitDocs,
