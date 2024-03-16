@@ -1,9 +1,11 @@
 import { Ollama } from "@langchain/community/llms/ollama";
-import { baseUrl, model } from "../constant/modelConfig.js";
+import { baseUrl } from "../constant/modelConfig.js";
+import { OllamaName } from "../constant/modelName.js";
 
 export const ollama = new Ollama({
     baseUrl: baseUrl, // Default value
-    model: model, // Default value
+    model: OllamaName.LLAMA2, // Default value
+    maxConcurrency: 5,
 });
 
 export const getOllamaStream=async (query: string):Promise<string> =>{

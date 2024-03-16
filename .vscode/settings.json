@@ -1,8 +1,15 @@
 {
     "cSpell.words": [
+        "CODELLAMA",
+        "DOLPHINPHI",
+        "LLAVA",
         "llms",
+        "longmeeting",
+        "NEURALCHAT",
         "ollama",
         "opensearch",
+        "ORCAMINI",
+        "summarydata",
         "vectorstores"
     ]
 }
